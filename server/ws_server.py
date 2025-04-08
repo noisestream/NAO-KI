@@ -1,6 +1,3 @@
-import cherrypy
-from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
-from ws4py.websocket import WebSocket
 import threading
 import json
 import time
@@ -9,16 +6,9 @@ import wave
 from audio_utils import voice_input
 from openai_utils import generate_command_from_prompt
 from websocket_server import CommandWebSocket, connected_clients
+from webserver import start_webserver
 
 connected_clients = {}
-
-class Root(object):
-    @cherrypy.expose
-    def index(self):
-        return "WebSocket Server läuft!"
-    @cherrypy.expose
-    def ws(self):
-        cherrypy.request.ws_handler
 
 def broadcast_command(command, target_client=None):
     message = json.dumps(command)
@@ -94,19 +84,6 @@ def conversation_manager():
 
 # --- Main Block: Webserver im Hintergrund ---
 if __name__ == '__main__':
-    cherrypy.config.update({
-        "server.socket_host": "0.0.0.0",
-        "server.socket_port": 9000
-    })
-    WebSocketPlugin(cherrypy.engine).subscribe()
-    cherrypy.tools.websocket = WebSocketTool()
-    config = {
-        "/ws": {
-            "tools.websocket.on": True,
-            "tools.websocket.handler_cls": CommandWebSocket
-        }
-    }
-    cherrypy.tree.mount(Root(), "/", config)
-    cherrypy.engine.start()
+    start_webserver()
     conversation_manager()
     cherrypy.engine.stop()
