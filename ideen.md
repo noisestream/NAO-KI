@@ -1,3 +1,4 @@
 - NAOs mit unterschiedlichen Stimmlagen
-- Mehr Kommandos: Gesten, Laufen, usw.
+- Animationen und andere Dinge einbauen, siehe http://doc.aldebaran.com/2-8/naoqi/index.html
+- Mehr Kommandos: Gesten, Laufen, Augen, usw.
 - Kann ChatGPT bestimmte Körperpositionen generieren?
