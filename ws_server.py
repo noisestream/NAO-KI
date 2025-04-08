@@ -6,12 +6,15 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import threading
 import json
-from openai import OpenAI
-
-client = OpenAI(api_key="OPENAI_API_KEY")
 import time
 import pyaudio
 import wave
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 conversation_history = [
     {

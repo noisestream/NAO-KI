@@ -70,7 +70,6 @@ class NAOWebSocketClient(WebSocketClient):
 if __name__ == '__main__':
     # Setze hier die WebSocket-URL deines Servers; ersetze <Laptop-IP> durch die tatsächliche IP (z.B. "192.168.1.50")
     ws_url = 'ws://<Laptop-IP>:9000/ws'
-    #ws_url = ws_url.replace("<Laptop-IP>", "192.168.1.50")
     
     try:
         ws = NAOWebSocketClient(ws_url, protocols=['http-only', 'chat'])
