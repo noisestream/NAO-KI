@@ -5,6 +5,8 @@ certifi==2025.1.31
 cheroot==10.0.1
 CherryPy==18.10.0
 distro==1.9.0
+gevent==24.11.1
+greenlet==3.1.1
 h11==0.14.0
 httpcore==1.0.7
 httpx==0.28.1
@@ -29,5 +31,8 @@ tempora==5.8.0
 tqdm==4.67.1
 typing-inspection==0.4.0
 typing_extensions==4.13.1
+websocket-client==1.8.0
 ws4py==0.6.0
 zc.lockfile==3.0.post1
+zope.event==5.0
+zope.interface==7.2
