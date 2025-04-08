@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from audio_utils import voice_input
+from openai_utils import generate_command_from_prompt
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -60,28 +61,6 @@ class Root(object):
     @cherrypy.expose
     def ws(self):
         cherrypy.request.ws_handler
-
-# --- API-Integration für Chat-Dialog ---
-def generate_command_from_prompt(prompt):
-    global conversation_history
-    if not prompt.strip():
-        prompt = "Bitte fahre mit der Konversation fort."
-    conversation_history.append({"role": "user", "content": prompt})
-    try:
-        response = client.chat.completions.create(model="gpt-4o-mini",
-        messages=conversation_history,
-        max_tokens=150,
-        temperature=0.7)
-        answer = response.choices[0].message.content.strip()
-        try:
-            command = json.loads(answer)
-        except Exception:
-            command = {"text": answer, "movement": "", "nextNao": None, "human_turn": False, "delay": 0}
-        conversation_history.append({"role": "assistant", "content": answer})
-        return command
-    except Exception as e:
-        print("Fehler beim API-Aufruf oder Parsen:", e)
-        return {"text": "Entschuldigung, ein Fehler ist aufgetreten.", "movement": "", "nextNao": None, "human_turn": False, "delay": 0}
 
 def broadcast_command(command, target_client=None):
     message = json.dumps(command)
