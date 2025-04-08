@@ -6,15 +6,13 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import threading
 import json
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key="OPENAI_API_KEY")
 import time
 import pyaudio
 import wave
 
-# --- OpenAI-Konfiguration ---
-openai.api_key = ""  # Deinen API-Schlüssel hier eintragen
-
-# --- Globale Gesprächshistorie (Conversation History) ---
 conversation_history = [
     {
         "role": "system",
@@ -31,10 +29,8 @@ conversation_history = [
     }
 ]
 
-# --- Verbundene Clients als Dictionary ---
 connected_clients = {}
 
-# --- WebSocket-Klasse ---
 class CommandWebSocket(WebSocket):
     def opened(self):
         print("Client verbunden:", self.peer_address)
@@ -105,8 +101,8 @@ def record_audio():
 def transcribe_audio(filename):
     print("Sende Audiodatei an Whisper API...")
     with open(filename, "rb") as audio_file:
-        transcript = openai.Audio.transcribe("whisper-1", audio_file)
-    return transcript["text"]
+        transcript = client.audio.transcribe("whisper-1", audio_file)
+    return transcript.text
 
 def voice_input():
     filename = record_audio()
@@ -121,12 +117,10 @@ def generate_command_from_prompt(prompt):
         prompt = "Bitte fahre mit der Konversation fort."
     conversation_history.append({"role": "user", "content": prompt})
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",  # oder das Modell, das du nutzen möchtest
-            messages=conversation_history,
-            max_tokens=150,
-            temperature=0.7
-        )
+        response = client.chat.completions.create(model="gpt-4o-mini",
+        messages=conversation_history,
+        max_tokens=150,
+        temperature=0.7)
         answer = response.choices[0].message.content.strip()
         try:
             command = json.loads(answer)
