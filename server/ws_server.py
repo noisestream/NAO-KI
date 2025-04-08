@@ -6,53 +6,11 @@ import json
 import time
 import pyaudio
 import wave
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
 from audio_utils import voice_input
 from openai_utils import generate_command_from_prompt
-
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-conversation_history = [
-    {
-        "role": "system",
-        "content": (
-            "Du bist ein intelligenter NAO-Dialog-Manager. Es sind genau zwei NAOs verbunden: Gerda & Peter. "
-            "Leite einen abwechselnden Dialog zwischen diesen beiden, SODASS SIE 3 BIS MAXIMAL 8 MAL ANTWORTEN, "
-            "bevor der Dialog wieder an den Menschen zurückgegeben wird. "
-            "In jeder Antwort gib den Schlüssel 'nextNao' an, der bestimmt, welcher NAO als Nächstes sprechen soll, "
-            "und einen 'delay'-Wert in Sekunden, der angibt, wie lange gewartet werden soll, bevor der nächste Turn beginnt. "
-            "Wenn der Dialog wieder an den Menschen übergeben werden soll, setze 'human_turn' auf true. "
-            "Antworte stets als gültiges JSON-Objekt mit den Schlüsseln 'text', 'movement', 'nextNao', 'delay' und 'human_turn'. "
-            "Beispiel: {\"text\": \"Ich winke dir zu!\", \"movement\": \"winken\", \"nextNao\": \"Peter\", \"delay\": 6, \"human_turn\": false}."
-        )
-    }
-]
+from websocket_server import CommandWebSocket, connected_clients
 
 connected_clients = {}
-
-class CommandWebSocket(WebSocket):
-    def opened(self):
-        print("Client verbunden:", self.peer_address)
-    def received_message(self, m):
-        try:
-            data = json.loads(m.data.decode("utf-8"))
-            if "client_id" in data:
-                client_id = data["client_id"]
-                connected_clients[client_id] = self
-                print("Registrierter Client:", client_id)
-            else:
-                print("Nachricht vom Client:", data)
-        except Exception as e:
-            print("Fehler beim Verarbeiten der Nachricht:", e)
-    def closed(self, code, reason=None):
-        print("Client getrennt:", self.peer_address)
-        for key, client in list(connected_clients.items()):
-            if client == self:
-                del connected_clients[key]
-                print("Client {} entfernt".format(key))
 
 class Root(object):
     @cherrypy.expose
