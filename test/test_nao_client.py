@@ -3,7 +3,8 @@ import json
 import random
 from ws4py.client.threadedclient import WebSocketClient
 
-CLIENT_ID = f"NAO-Test-{random.randint(1, 1000)}"
+# Get client ID from command line args or use default
+CLIENT_ID = sys.argv[1] if len(sys.argv) > 1 else f"NAO-Test-{random.randint(1, 1000)}"
 
 class NAOWebSocketClient(WebSocketClient):
     def opened(self):

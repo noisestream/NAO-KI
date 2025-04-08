@@ -45,7 +45,7 @@ OPENAI_API_KEY=the_api_key_from_openai
 Auf dem Laptop den Server starten:
 
 ```bash
-python3 ws_server.py
+python ws_server.py
 ```
 
 Auf den beteiligten NAOs (mindestens 2) im Terminal den Client starten:
@@ -55,3 +55,9 @@ python2 ws_client.py
 ```
 
 Nun kann der Server im Terminal Eingaben entgegennehmen.
+
+## Test
+
+```bash
+python test/test_nao_client.py Gerda
+```
