@@ -1,6 +1,26 @@
 import requests
 import json
 import time
+import threading
+
+CLIENT_ID = "SimClient"
+
+def simulate_persistent_http_client():
+    print("🟢 Starte simulierten Client (HTTP)...")
+
+    try:
+        while True:
+            # Simuliere Registrierung bei jedem Poll (oder nur einmalig, wenn der Server das speichert)
+            data = {"client_id": CLIENT_ID}
+            try:
+                response = requests.post("http://localhost:9000/", json=data)
+                print("[HTTP-Antwort]", response.text)
+            except Exception as e:
+                print("❌ Fehler bei HTTP-Anfrage:", e)
+
+            time.sleep(2)  # Poll-Intervall in Sekunden
+    except KeyboardInterrupt:
+        print("🛑 Beenden...")
 
 def test_register_client():
     data = {"client_id": "client_123"}
@@ -33,7 +53,8 @@ TESTS = {
     "2": ("Nachricht ohne client_id", test_send_message),
     "3": ("Ungültiges JSON senden", test_invalid_json),
     "4": ("Mehrere Clients registrieren", test_register_multiple),
-    "5": ("Verbindung schließen (nur Hinweis)", test_close_connection)
+    "5": ("Verbindung schließen (nur Hinweis)", test_close_connection),
+    "6": ("Dauerhafter WS-Client (simulierter NAO)", simulate_persistent_http_client)
 }
 
 if __name__ == "__main__":
