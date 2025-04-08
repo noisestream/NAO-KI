@@ -1,50 +1,50 @@
-import websocket
+import requests
 import json
 import time
 
-def test_register_client(ws):
-    ws.send(json.dumps({"client_id": "client_123"}))
+def test_register_client():
+    data = {"client_id": "client_123"}
+    response = requests.post("http://localhost:9000/", json=data)
+    print("Antwort:", response.text)
 
-def test_send_message(ws):
-    ws.send(json.dumps({"message": "Hallo Server"}))
+def test_send_message():
+    data = {"message": "Hallo Server"}
+    response = requests.post("http://localhost:9000/", json=data)
+    print("Antwort:", response.text)
 
-def test_invalid_json(ws):
-    ws.send("{this is not: valid json")
+def test_invalid_json():
+    headers = {"Content-Type": "application/json"}
+    response = requests.post("http://localhost:9000/", data="{this is not: valid json", headers=headers)
+    print("Antwort:", response.text)
 
-def test_register_multiple(ws):
+def test_register_multiple():
     for i in range(3):
-        ws.send(json.dumps({"client_id": f"client_{i}"}))
+        data = {"client_id": f"client_{i}"}
+        response = requests.post("http://localhost:9000/", json=data)
+        print(f"Antwort {i}:", response.text)
         time.sleep(0.2)
 
-def test_close_connection(ws):
-    ws.close()
+def test_close_connection():
+    print("❌ HTTP-Verbindungen sind kurzlebig und müssen nicht explizit geschlossen werden.")
 
-def on_open(ws):
-    print("Verbindung geöffnet")
-
-    # === Hier den gewünschten Testfall aufrufen ===
-    test_register_client(ws)
-    # test_send_message(ws)
-    # test_invalid_json(ws)
-    # test_register_multiple(ws)
-    # test_close_connection(ws)
-
-def on_message(ws, message):
-    print("Nachricht vom Server:", message)
-
-def on_error(ws, error):
-    print("Fehler:", error)
-
-def on_close(ws, close_status_code, close_msg):
-    print("Verbindung geschlossen")
+# Menüdefinition
+TESTS = {
+    "1": ("Client registrieren", test_register_client),
+    "2": ("Nachricht ohne client_id", test_send_message),
+    "3": ("Ungültiges JSON senden", test_invalid_json),
+    "4": ("Mehrere Clients registrieren", test_register_multiple),
+    "5": ("Verbindung schließen (nur Hinweis)", test_close_connection)
+}
 
 if __name__ == "__main__":
-    ws = websocket.WebSocketApp(
-        "ws://localhost:9000/",  # Passe die URL ggf. an
-        on_open=on_open,
-        on_message=on_message,
-        on_error=on_error,
-        on_close=on_close
-    )
+    print("\n🔌 Verbindung via HTTP vorbereitet.\n")
+    print("Wähle einen Testfall aus:")
+    for key, (desc, _) in TESTS.items():
+        print(f" {key}. {desc}")
+    choice = input("\nNummer eingeben und Enter drücken: ").strip()
 
-    ws.run_forever()
+    if choice in TESTS:
+        _, test_func = TESTS[choice]
+        test_func()
+    else:
+        print("❌ Ungültige Auswahl.")
