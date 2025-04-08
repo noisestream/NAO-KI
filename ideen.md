@@ -1,0 +1,3 @@
+- NAOs mit unterschiedlichen Stimmlagen
+- Mehr Kommandos: Gesten, Laufen, usw.
+- Kann ChatGPT bestimmte Körperpositionen generieren?
