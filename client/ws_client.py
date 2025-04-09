@@ -7,7 +7,7 @@ from ws4py.client.threadedclient import WebSocketClient
 from naoqi import ALProxy
 
 # Eindeutige Client-ID – passe diesen Wert individuell an
-CLIENT_ID = "NAO1"
+CLIENT_ID = "Gerda" # Name des NAOs, z.B. "Gerda" oder "Peter"
 
 class NAOWebSocketClient(WebSocketClient):
     def opened(self):
