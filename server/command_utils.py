@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from websocket_server import connected_clients
 
@@ -24,7 +25,7 @@ def broadcast_command(command, target_client=None):
             except Exception as e:
                 print(f"[{_message_counter}] Fehler beim Senden an einen Client: {e}")
 
-def calculate_delay(text, min_delay=5):
-    words = text.split()
-    estimated_duration = len(words) / 1.9  # geschätzt 1.9 w/s
-    return max(min_delay, estimated_duration)
+def calculate_delay(text, words_per_second=1.9):
+    word_count = len(re.findall(r'\w+', text))
+    estimated_duration = word_count / words_per_second
+    return max(3, estimated_duration)
