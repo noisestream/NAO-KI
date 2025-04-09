@@ -45,7 +45,7 @@ OPENAI_API_KEY=the_api_key_from_openai
 Auf dem Laptop den Server starten:
 
 ```bash
-python server/ws_server.py
+python server/main.py
 ```
 
 Auf den beteiligten NAOs (mindestens 2) im Terminal den Client starten:

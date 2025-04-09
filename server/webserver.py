@@ -27,3 +27,6 @@ def start_webserver(host="0.0.0.0", port=9000):
     }
     cherrypy.tree.mount(Root(), "/", config)
     cherrypy.engine.start()
+
+def stop_webserver():
+    cherrypy.engine.exit()
