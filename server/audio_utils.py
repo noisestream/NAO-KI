@@ -17,7 +17,10 @@ OUTPUT_FILENAME = "recording.wav"
 def transcribe_audio(filename):
     print("Sende Audiodatei an Whisper API...")
     with open(filename, "rb") as audio_file:
-        transcript = client.audio.transcribe("whisper-1", audio_file)
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file
+        )
     return transcript.text
 
 def voice_input():
@@ -40,7 +43,7 @@ def record_audio():
     stop_thread.start()
     while recording[0]:
         try:
-            data = stream.read(CHUNK)
+            data = stream.read(CHUNK, exception_on_overflow=False)
             frames.append(data)
         except Exception as e:
             print("Fehler beim Aufnehmen:", e)
