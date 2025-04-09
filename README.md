@@ -12,9 +12,9 @@ pip2 install --user ws4py
 
 3. Neue Datei `ws_client.py` auf NAO erstellen und mit `nano` oder `vim` bearbeiten.
 
-4. Code aus [ws_client.py](ws_client.py) in Editor einfügen und anpassen:
+4. Code aus [ws_client.py](client/ws_client.py) in Editor einfügen und anpassen:
 
-- `CLIENT_ID` am Anfang des Codes muss eindeutig sein (z.B. Nummer des NAO)
+- `CLIENT_ID` am Anfang des Codes muss eindeutig sein &mdash; dort die Namen der NAOs im Dialog eintragen (z.B. Gerda und Peter)
 - `ws_url` am Ende des Codes muss die IP-Adresse des Laptops enthalten
 
 ## Server (Laptop)
@@ -45,7 +45,7 @@ OPENAI_API_KEY=the_api_key_from_openai
 Auf dem Laptop den Server starten:
 
 ```bash
-python ws_server.py
+python server/ws_server.py
 ```
 
 Auf den beteiligten NAOs (mindestens 2) im Terminal den Client starten:
