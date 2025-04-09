@@ -25,7 +25,13 @@ def broadcast_command(command, target_client=None):
             except Exception as e:
                 print(f"[{_message_counter}] Fehler beim Senden an einen Client: {e}")
 
-def calculate_delay(text, words_per_second=1.9):
+def calculate_delay(text, min_delay=5, words_per_second=1.9, pause_per_sentence=0.6):
     word_count = len(re.findall(r'\w+', text))
-    estimated_duration = word_count / words_per_second
-    return max(3, estimated_duration)
+    sentence_count = len(re.findall(r'[.!?]', text))
+    
+    estimated_word_duration = word_count / words_per_second
+    estimated_pause_duration = sentence_count * pause_per_sentence
+    
+    total_duration = estimated_word_duration + estimated_pause_duration
+    return max(min_delay, total_duration)
+
