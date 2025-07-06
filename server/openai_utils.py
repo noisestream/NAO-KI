@@ -21,8 +21,8 @@ Antworte stets als valides JSON-Objekt mit den Schlüsseln:
 - "human_turn"       (optional: true, wenn der Mensch wieder sprechen soll)
 - "end_conversation" (optional: true, wenn die Unterhaltung abgeschlossen ist)
 
-Wenn du die Konversation beenden möchtest oder eine Frage an den Nutzer hast,
-setze entweder "end_conversation": true oder "human_turn": true.
+Wenn du eine Frage stellst oder eine Antwort erwartest, setze IMMER "human_turn": true.
+Wenn du die Konversation beenden möchtest setze IMMER "end_conversation": true 
 
 Beispiele:
 {

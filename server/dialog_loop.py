@@ -3,7 +3,7 @@ import time
 from openai_utils import generate_command_from_prompt
 from command_utils import broadcast_command, calculate_delay, get_single_nao
 
-def conversation_loop(max_turns=10):
+def conversation_loop(max_turns=3):
     print("Starte automatischen NAO-Konversationsmodus...")
     turns = 0
 
