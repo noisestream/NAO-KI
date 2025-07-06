@@ -7,8 +7,9 @@ from command_utils import broadcast_command, get_single_nao
 class Root(object):
     @cherrypy.expose
     def index(self):
-        # Liefert das HTML-Interface direkt, kein externes File mehr nötig
-        html = f"""<!DOCTYPE html>
+        # Inlined HTML-Interface mit dynamischem Status
+        status_text = 'verbunden' if get_single_nao() else 'nicht verbunden'
+        html = """<!DOCTYPE html>
 <html lang=\"de\">
 <head>
     <meta charset=\"UTF-8\">
@@ -23,7 +24,7 @@ class Root(object):
 </head>
 <body>
     <h1>NAO Web-Interface</h1>
-    <div id=\"status\">Verbindung zum NAO: {'verbunden' if get_single_nao() else 'nicht verbunden'}</div>
+    <div id=\"status\">Verbindung zum NAO: """ + status_text + """</div>
     <div id=\"log\"></div>
     <div id=\"controls\">
         <input type=\"text\" id=\"prompt\" placeholder=\"Gib deinen Text ein...\" />
