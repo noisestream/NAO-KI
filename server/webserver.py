@@ -74,11 +74,10 @@ class Root(object):
 </html>
 """
         return html
-
+    
     @cherrypy.expose
     def ws(self):
-        # WebSocket-Handshake
-        return cherrypy.request.ws_handler
+        cherrypy.request.ws_handler
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
