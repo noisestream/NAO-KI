@@ -7,10 +7,9 @@ load_dotenv()
 
 client = Client(
     host='http://localhost:11434',
-    headers={'x-some-header': 'some-value'}  # Dummy-Header ist OK
+    headers={'x-some-header': 'some-value'}
 )
 
-# Leere Historie + Systemanleitung als erste "Nachricht"
 conversation_history = [{
     "role": "assistant",
     "content": """
@@ -42,10 +41,8 @@ Beispiel:
 
 def generate_command_from_prompt(prompt):
     global conversation_history
-
     if not prompt.strip():
         prompt = "Bitte fahre mit der Konversation fort."
-
     conversation_history.append({"role": "user", "content": prompt})
 
     try:
@@ -54,28 +51,24 @@ def generate_command_from_prompt(prompt):
             messages=conversation_history,
             stream=False
         )
+        # Robuster Zugriff auf die Antwort
+        try:
+            answer = response.choices[0].message.content.strip()
+        except AttributeError:
+            answer = response.message.content.strip()
 
-        # Zugriff abhängig von deiner Ollama-Version:
-        answer = response.choices[0].message.content.strip()
-
+        # JSON-Parsen mit Fallback
         try:
             command = json.loads(answer)
-        except Exception:
-            command = {
-                "text": answer,
-                "movement": "",
-                "delay": 0,
-                "human_turn": True  # fallback: gib Kontrolle an Nutzer
-            }
+        except json.JSONDecodeError:
+            command = {"text": answer, "movement": "", "delay": 0, "human_turn": True}
 
         conversation_history.append({"role": "assistant", "content": answer})
         return command
 
     except Exception as e:
         print("Fehler beim API-Aufruf oder Parsen:", e)
-        return {
-            "text": "Entschuldigung, ein Fehler ist aufgetreten.",
-            "movement": "",
-            "delay": 0,
-            "human_turn": True
-        }
+        return {"text": "Entschuldigung, ein Fehler ist aufgetreten.",
+                "movement": "",
+                "delay": 0,
+                "human_turn": True}
