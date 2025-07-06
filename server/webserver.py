@@ -7,28 +7,29 @@ from command_utils import broadcast_command, get_single_nao
 class Root(object):
     @cherrypy.expose
     def index(self):
-        # Inlined HTML-Interface mit dynamischem Status
+        # Inline HTML-Interface mit Statusanzeige
         status_text = 'verbunden' if get_single_nao() else 'nicht verbunden'
-        html = """<!DOCTYPE html>
-<html lang=\"de\">
+        html = """
+<!DOCTYPE html>
+<html lang="de">
 <head>
-    <meta charset=\"UTF-8\">
+    <meta charset="UTF-8">
     <title>NAO Control</title>
     <style>
-        body {{ font-family: Arial, sans-serif; margin: 2rem; }}
-        #log {{ border: 1px solid #ccc; padding: 1rem; height: 300px; overflow-y: scroll; }}
-        #controls {{ margin-top: 1rem; }}
-        input[type=text] {{ width: 80%; padding: 0.5rem; }}
-        button {{ padding: 0.5rem 1rem; }}
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        #log { border: 1px solid #ccc; padding: 1rem; height: 300px; overflow-y: scroll; }
+        #controls { margin-top: 1rem; }
+        input[type=text] { width: 80%; padding: 0.5rem; }
+        button { padding: 0.5rem 1rem; }
     </style>
 </head>
 <body>
     <h1>NAO Web-Interface</h1>
-    <div id=\"status\">Verbindung zum NAO: """ + status_text + """</div>
-    <div id=\"log\"></div>
-    <div id=\"controls\">
-        <input type=\"text\" id=\"prompt\" placeholder=\"Gib deinen Text ein...\" />
-        <button id=\"sendBtn\">Senden</button>
+    <div id="status">Verbindung zum NAO: """ + status_text + """</div>
+    <div id="log"></div>
+    <div id="controls">
+        <input type="text" id="prompt" placeholder="Gib deinen Text ein..." />
+        <button id="sendBtn">Senden</button>
     </div>
     <script>
         const logEl = document.getElementById('log');
@@ -58,7 +59,7 @@ class Root(object):
             .then(resp => resp.json())
             .then(data => {
                 const line = document.createElement('div');
-                if(data.status==='error'){
+                if (data.status === 'error') {
                     line.textContent = '❌ ' + data.message;
                 } else {
                     line.textContent = '✔️ Gesendet: ' + prompt;
@@ -70,13 +71,14 @@ class Root(object):
         };
     </script>
 </body>
-</html>"""
+</html>
+"""
         return html
 
     @cherrypy.expose
     def ws(self):
         # WebSocket-Handshake
-        cherrypy.request.ws_handler
+        return cherrypy.request.ws_handler
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -93,7 +95,7 @@ class Root(object):
         broadcast_command(command)
         return {'status': 'ok', 'command': command}
 
-# Webserver-Setup
+# Funktionen zum Starten und Stoppen des Servers
 
 def start_webserver(host="0.0.0.0", port=9000):
     cherrypy.config.update({
@@ -103,12 +105,13 @@ def start_webserver(host="0.0.0.0", port=9000):
     WebSocketPlugin(cherrypy.engine).subscribe()
     cherrypy.tools.websocket = WebSocketTool()
     config = {
-        "/ws": {"tools.websocket.on": True,
-                 "tools.websocket.handler_cls": CommandWebSocket}
+        "/ws": {
+            "tools.websocket.on": True,
+            "tools.websocket.handler_cls": CommandWebSocket
+        }
     }
     cherrypy.tree.mount(Root(), "/", config)
     cherrypy.engine.start()
-
 
 def stop_webserver():
     cherrypy.engine.exit()
