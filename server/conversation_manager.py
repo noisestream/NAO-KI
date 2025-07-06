@@ -40,7 +40,7 @@ def conversation_manager():
                 break
 
         # Erster LLM-Aufruf für menschliche Eingabe
-        print("Sende Anfrage an LLM...")
+        # print("Sende Anfrage an LLM...")
         command = generate_command_from_prompt(prompt)
         broadcast_command(command)
 
