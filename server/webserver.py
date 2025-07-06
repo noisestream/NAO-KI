@@ -78,7 +78,7 @@ class Root(object):
     @cherrypy.expose
     def ws(self):
         cherrypy.request.ws_handler
-
+ 
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()

@@ -2,7 +2,7 @@ import json
 import cherrypy
 from ws4py.websocket import WebSocket
 from command_utils import set_single_nao, single_nao_client
-
+ 
 class CommandWebSocket(WebSocket):
     def opened(self):
         # Neue WebSocket-Verbindung geöffnet
