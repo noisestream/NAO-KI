@@ -53,7 +53,7 @@ class Root(object):
       document.getElementById('userInput').style.display = mode==='t' ? 'inline-block' : 'none';
       document.getElementById('sendBtn').style.display  = mode==='t' ? 'inline-block' : 'none';
       document.getElementById('voiceBtn').style.display = mode==='v' ? 'inline-block' : 'none';
-      log(`Modus gesetzt auf ${mode==='t'?'Text':'Voice'}`);
+      log('Modus gesetzt auf ' + (mode==='t' ? 'Text' : 'Voice'));
     };
 
     document.getElementById('sendBtn').onclick = () => {
@@ -63,9 +63,9 @@ class Root(object):
         method: 'POST', headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ prompt })
       }).then(res=>res.json()).then(res=>{
-        log(`Du: ${prompt}`);
-        if(res.status==='ok') log(`NAO: ${res.command.text}`);
-        else log(`Fehler: ${res.message}`);
+        log('Du: ' + prompt);
+        if(res.status==='ok') log('NAO: ' + res.command.text);
+        else log('Fehler: ' + res.message);
       });
       document.getElementById('userInput').value = '';
     };
@@ -76,15 +76,15 @@ class Root(object):
         .then(res=>res.json())
         .then(res=>{
           if(res.prompt) {
-            log(`Transkript: ${res.prompt}`);
+            log('Transkript: ' + res.prompt);
             fetch('/prompt',{ method:'POST', headers:{ 'Content-Type':'application/json' },
               body: JSON.stringify({ prompt: res.prompt })})
             .then(r=>r.json()).then(r=>{
-              if(r.status==='ok') log(`NAO: ${r.command.text}`);
-              else log(`Fehler: ${r.message}`);
+              if(r.status==='ok') log('NAO: ' + r.command.text);
+              else log('Fehler: ' + r.message);
             });
           } else {
-            log(`Fehler: ${res.message}`);
+            log('Fehler: ' + res.message);
           }
         });
     };
@@ -150,4 +150,3 @@ def start_webserver(host="0.0.0.0", port=9000):
 
 def stop_webserver():
     cherrypy.engine.exit()
-```
