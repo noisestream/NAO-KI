@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import time
 from dotenv import load_dotenv
 from ollama import Client
 
@@ -55,14 +56,20 @@ def generate_command_from_prompt(prompt):
     if not prompt.strip():
         prompt = "Bitte fahre mit der Konversation fort."
     conversation_history.append({"role": "user", "content": prompt})
-
+    
+    
+    
     try:
+        start = time.time()
         response = client.chat(
             model='gemma3:latest',
             messages=conversation_history,
             stream=False
         )
 
+        duration = time.time() - start
+        print(f"⏱ LLM-Aufruf dauerte {duration:.2f}s")
+        
         # Antworttext vom LLM
         try:
             answer = response.choices[0].message.content.strip()
