@@ -39,6 +39,14 @@ Beispiele:
 }
 
 Gib **nur** das reine JSON-Objekt aus – **ohne** ```Backticks``` oder sonstige Markdown-Formatierung!
+
+Du kannst dich auch bewegen. Welche Bewegung du jeweils ausführen willst, gibst du mit "movement" an.
+Folgende Bewegungen stehen zu Verfügung:
+
+Kopf nicken: nicken
+kopf neigen: neigen
+winken: winken
+Arme heben: heben
 """.strip()
 }]
 
