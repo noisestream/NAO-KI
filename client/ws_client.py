@@ -7,7 +7,7 @@ from ws4py.client.threadedclient import WebSocketClient
 from naoqi import ALProxy
 
 # Eindeutige Client-ID – passe diesen Wert individuell an
-CLIENT_ID = "Gerda" # Name des NAOs, z.B. "Gerda" oder "Peter"
+CLIENT_ID = "Nao" # Name des NAOs, z.B. "Gerda" oder "Peter"
 
 class NAOWebSocketClient(WebSocketClient):
     def opened(self):
@@ -69,7 +69,7 @@ class NAOWebSocketClient(WebSocketClient):
 
 if __name__ == '__main__':
     # Setze hier die WebSocket-URL deines Servers; ersetze <Laptop-IP> durch die tatsächliche IP (z.B. "192.168.1.50")
-    ws_url = 'ws://<Laptop-IP>:9000/ws'
+    ws_url = 'ws://192.168.8.152:9000/ws'
     
     try:
         ws = NAOWebSocketClient(ws_url, protocols=['http-only', 'chat'])
