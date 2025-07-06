@@ -1,40 +1,41 @@
+# server/openai_utils.py
 import os
 import json
 from dotenv import load_dotenv
 from ollama import Client
 
 load_dotenv()
-
-client = Client(
-    host='http://localhost:11434',
-    headers={'x-some-header': 'some-value'}
-)
+client = Client(host='http://localhost:11434')
 
 conversation_history = [{
     "role": "assistant",
     "content": """
-Du bist ein kleiner Roboter aus München mit dem Namen Nao. 
-Reagiere wie ein Chatbot. 
-Antworte nur in maximal 4 kurzen Sätzen und bleibe im Kontext. 
-Bleibe jugendfrei. 
-Benutze keine Emojis oder Smilies in der Antwort.
+Du bist ein kleiner Roboter aus München mit dem Namen Nao.
+Reagiere wie ein Chatbot: kurze, kontextbezogene Antworten (max. 4 Sätze).
+Bleibe jugendfrei und benutze keine Emojis.
 
-In jeder Antwort gib den Schlüssel 'delay'-Wert in Sekunden mit an, der angibt, wie lange gewartet werden soll, bevor der nächste Turn beginnt.
+Antworte stets als valides JSON-Objekt mit den Schlüsseln:
+- "text"
+- "movement"
+- "delay"         (Sekunden bis zum nächsten Befehl)
+- "human_turn"    (optional: true, wenn der Mensch wieder sprechen soll)
+- "end_conversation" (optional: true, wenn die Unterhaltung abgeschlossen ist)
 
-Antworte stets als gültiges JSON-Objekt mit den Schlüsseln:
-  - 'text'
-  - 'movement'
-  - 'delay'
-  - 'human_turn' (optional: true, wenn der Mensch wieder sprechen soll)
+Wenn du die Konversation beenden möchtest oder eine Frage an den Nutzer hast,
+setze entweder "end_conversation": true oder "human_turn": true.
 
-Wenn du den Menschen zum Antworten auffordern willst, setze "human_turn": true.
-
-Beispiel:
+Beispiele:
 {
-  "text": "Hast du eine Frage?",
-  "movement": "winken",
-  "human_turn": true,
-  "delay": 5
+  "text": "Hast du noch eine Frage?",
+  "movement": "nicken",
+  "delay": 5,
+  "human_turn": true
+}
+{
+  "text": "Danke für das Gespräch!",
+  "movement": "verbeugen",
+  "delay": 3,
+  "end_conversation": true
 }
 """.strip()
 }]
@@ -51,24 +52,30 @@ def generate_command_from_prompt(prompt):
             messages=conversation_history,
             stream=False
         )
-        # Robuster Zugriff auf die Antwort
+        # robusten Zugriff je nach ollama-Version
         try:
             answer = response.choices[0].message.content.strip()
         except AttributeError:
             answer = response.message.content.strip()
 
-        # JSON-Parsen mit Fallback
         try:
             command = json.loads(answer)
         except json.JSONDecodeError:
-            command = {"text": answer, "movement": "", "delay": 0, "human_turn": True}
+            command = {
+                "text": answer,
+                "movement": "",
+                "delay": 0,
+                "human_turn": True
+            }
 
         conversation_history.append({"role": "assistant", "content": answer})
         return command
 
     except Exception as e:
-        print("Fehler beim API-Aufruf oder Parsen:", e)
-        return {"text": "Entschuldigung, ein Fehler ist aufgetreten.",
-                "movement": "",
-                "delay": 0,
-                "human_turn": True}
+        print("Fehler beim API-Aufruf:", e)
+        return {
+            "text": "Entschuldigung, ein Fehler ist aufgetreten.",
+            "movement": "",
+            "delay": 0,
+            "human_turn": True
+        }

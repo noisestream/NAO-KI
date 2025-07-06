@@ -1,79 +1,70 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import json
-from ws4py.client.threadedclient import WebSocketClient
-from naoqi import ALProxy
+import time
+from websocket import WebSocketApp
 
-# Eindeutige Client-ID – passe diesen Wert individuell an
-CLIENT_ID = "Nao" # Name des NAOs, z.B. "Gerda" oder "Peter"
+# Adresse deines WebSocket-Servers
+WS_URL = "ws://192.168.8.152:9000/ws"
 
-class NAOWebSocketClient(WebSocketClient):
-    def opened(self):
-        print "Verbindung geöffnet:", self.peer_address
-        # Registrierungsnachricht an den Server senden
-        self.send(json.dumps({"client_id": CLIENT_ID}))
+# Eindeutige ID für deinen NAO
+CLIENT_ID = "nao1"
 
-    def closed(self, code, reason=None):
-        print "Verbindung geschlossen: Code =", code, "Reason =", reason
+def on_open(ws):
+    print("Verbunden zum Server:", WS_URL)
+    register_msg = {
+        "client_type": "nao",
+        "client_id": CLIENT_ID
+    }
+    msg_str = json.dumps(register_msg)
+    ws.send(msg_str)
+    print(">> Registrierungsnachricht gesendet:", msg_str)
 
-    def received_message(self, m):
-        print "Nachricht erhalten:", m.data
-        try:
-            # Dekodiere die eingehende Nachricht als UTF-8 und parse sie als JSON
-            command = json.loads(m.data.decode("utf-8"))
-            if "text" in command:
-                self.execute_text(command["text"])
-            if "movement" in command:
-                self.execute_motion(command["movement"])
-        except Exception as e:
-            print "Fehler beim Verarbeiten der Nachricht:", e
-
-    def execute_text(self, text):
-        try:
-            tts = ALProxy("ALTextToSpeech", "127.0.0.1", 9559)
-            # Stelle sicher, dass 'text' ein Unicode-Objekt ist
-            if not isinstance(text, unicode):
-                text = text.decode("utf-8", "ignore")
-            text_utf8 = text.encode("utf-8", "ignore")
-            tts.say(text_utf8)
-            print "Sprachausgabe ausgeführt:", text_utf8
-        except Exception as e:
-            print "Fehler bei TTS:", e
-
-    def execute_motion(self, motion_command):
-        try:
-            motion = ALProxy("ALMotion", "127.0.0.1", 9559)
-            if motion_command == "nicken":
-                motion.angleInterpolation("HeadPitch", [0.2, -0.2, 0.0],
-                                          [0.5, 1.0, 1.5], True)
-                print "Bewegung ausgeführt: nicken"
-            elif motion_command == "winken":
-                motion.angleInterpolation("LShoulderPitch", [1.2, 0.7, 1.2, 0.7, 1.2],
-                                          [0.5, 1.0, 1.5, 2.0, 2.5], True)
-                print "Bewegung ausgeführt: winken"
-            elif motion_command == "freudig":
-                # Beispiel: Beide Schultern leicht heben
-                motion.angleInterpolation(["RShoulderPitch", "LShoulderPitch"],
-                                          [-0.2, -0.2], [1.0, 1.0], True)
-                print "Bewegung ausgeführt: freudig"
-            elif motion_command == "shake_head":
-                motion.angleInterpolation("HeadYaw", [0.5, -0.5, 0.0],
-                                          [0.5, 1.5, 2.0], True)
-                print "Bewegung ausgeführt: shake_head"
-            else:
-                print "Keine definierte Bewegung für:", motion_command
-        except Exception as e:
-            print "Fehler bei Bewegung:", e
-
-if __name__ == '__main__':
-    # Setze hier die WebSocket-URL deines Servers; ersetze <Laptop-IP> durch die tatsächliche IP (z.B. "192.168.1.50")
-    ws_url = 'ws://192.168.8.152:9000/ws'
-    
+def on_message(ws, m):
+    raw = m if isinstance(m, unicode) else m.decode("utf-8")
+    print("<< Roh empfangen:", raw)
     try:
-        ws = NAOWebSocketClient(ws_url, protocols=['http-only', 'chat'])
-        ws.connect()
-        ws.run_forever()
-    except KeyboardInterrupt:
-        ws.close()
+        cmd = json.loads(raw)
+    except ValueError as e:
+        print("❌ JSON-Parsing-Fehler:", e)
+        return
+
+    text = cmd.get("text")
+    movement = cmd.get("movement")
+    delay = cmd.get("delay", 0)
+
+    # Validierung
+    if not isinstance(text, basestring) or not isinstance(movement, basestring):
+        print("❌ Ungültiger Befehl:", cmd)
+        return
+
+    print("✅ Befehl:", cmd)
+    # Hier die NAO-API-Aufrufe einfügen, z.B.:
+    # nao_proxy.say(text)
+    # nao_proxy.move(movement)
+    print("-> Text: %s | Bewegung: %s | Verzögerung: %ss" % (text, movement, delay))
+
+def on_error(ws, error):
+    print("❌ WebSocket-Fehler:", error)
+
+def on_close(ws, code, reason=None):
+    print("⚠️ Verbindung geschlossen (code=%s, reason=%s)" % (code, reason))
+
+if __name__ == "__main__":
+    # Stelle sicher, dass websocket-client installiert ist:
+    # sudo pip install websocket-client
+    while True:
+        try:
+            ws = WebSocketApp(
+                WS_URL,
+                on_open=on_open,
+                on_message=on_message,
+                on_error=on_error,
+                on_close=on_close
+            )
+            ws.run_forever()
+        except Exception as e:
+            print("❌ Laufzeitfehler:", e)
+        print("⏳ Erneuter Verbindungsversuch in 5 Sekunden...")
+        time.sleep(5)
