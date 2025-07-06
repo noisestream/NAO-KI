@@ -1,6 +1,6 @@
-# server/openai_utils.py
 import os
 import json
+import re
 from dotenv import load_dotenv
 from ollama import Client
 
@@ -17,8 +17,8 @@ Bleibe jugendfrei und benutze keine Emojis.
 Antworte stets als valides JSON-Objekt mit den Schlüsseln:
 - "text"
 - "movement"
-- "delay"         (Sekunden bis zum nächsten Befehl)
-- "human_turn"    (optional: true, wenn der Mensch wieder sprechen soll)
+- "delay"            (Sekunden bis zum nächsten Befehl)
+- "human_turn"       (optional: true, wenn der Mensch wieder sprechen soll)
 - "end_conversation" (optional: true, wenn die Unterhaltung abgeschlossen ist)
 
 Wenn du die Konversation beenden möchtest oder eine Frage an den Nutzer hast,
@@ -37,6 +37,8 @@ Beispiele:
   "delay": 3,
   "end_conversation": true
 }
+
+Gib **nur** das reine JSON-Objekt aus – **ohne** ```Backticks``` oder sonstige Markdown-Formatierung!
 """.strip()
 }]
 
@@ -52,12 +54,22 @@ def generate_command_from_prompt(prompt):
             messages=conversation_history,
             stream=False
         )
-        # robusten Zugriff je nach ollama-Version
+
+        # Antworttext vom LLM
         try:
             answer = response.choices[0].message.content.strip()
         except AttributeError:
             answer = response.message.content.strip()
 
+        # 1) Markdown-Codefences entfernen, falls vorhanden
+        if answer.startswith("```"):
+            m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", answer, re.S)
+            if m:
+                answer = m.group(1)
+            else:
+                answer = answer.replace("```", "")
+
+        # 2) Versuch, das bereinigte JSON zu parsen
         try:
             command = json.loads(answer)
         except json.JSONDecodeError:
