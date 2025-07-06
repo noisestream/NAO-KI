@@ -3,6 +3,7 @@ import threading
 import pyaudio
 import wave
 import json
+import sys
 from vosk import Model, KaldiRecognizer
 from dotenv import load_dotenv
 
@@ -31,7 +32,12 @@ def record_audio():
 
     frames = []
 
-    input("🎤 Drücke Enter, um die Aufnahme zu starten...")
+    user_input = input("🎤 Drücke Enter, um die Aufnahme zu starten... (oder 'exit' zum Beenden) ")
+
+    if user_input.strip().lower() == 'exit':
+        print("Programm wird beendet.")
+        sys.exit(0)
+
     print("🟢 Aufnahme läuft... Drücke Enter, um zu stoppen.")
 
     recording = [True]
