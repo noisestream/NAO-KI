@@ -3,10 +3,14 @@ import json
 import re
 import time
 from dotenv import load_dotenv
-from ollama import Client
+# from ollama import Client
+import openai
 
 load_dotenv()
-client = Client(host='http://localhost:11434')
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# client = Client(host='http://localhost:11434')
 
 conversation_history = [{
     "role": "assistant",
@@ -64,10 +68,17 @@ def generate_command_from_prompt(prompt):
         
         print("Sende Anfrage an LLM...")
 
-        response = client.chat(
-            model='gemma3:latest',
+#        response = client.chat(
+#            model='gemma3:latest',
+#            messages=conversation_history,
+#            stream=False
+#        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
             messages=conversation_history,
-            stream=False
+            temperature=0.7,
+            max_tokens=150
         )
 
         duration = time.time() - start
