@@ -4,11 +4,13 @@ import re
 import time
 from dotenv import load_dotenv
 # from ollama import Client
-import openai
+from openai import OpenAI
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
 # client = Client(host='http://localhost:11434')
 
@@ -74,7 +76,7 @@ def generate_command_from_prompt(prompt):
 #            stream=False
 #        )
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=conversation_history,
             temperature=0.7,
