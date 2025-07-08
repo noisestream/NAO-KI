@@ -48,7 +48,7 @@ def perform_movement(move):
             motion.angleInterpolation("RElbowRoll", 0.5, 0.5, True)
         posture.goToPosture("StandInit", 0.5)
 
-    elif "arm heben" in m and "heben" in m:
+    elif "heben" in m:
         print("  → Arme heben")
         names  = ["LShoulderPitch","LElbowRoll","RShoulderPitch","RElbowRoll"]
         angles = [0.2, 0.3, -0.2, -0.3]
@@ -56,15 +56,15 @@ def perform_movement(move):
         motion.angleInterpolation(names, angles, times, True)
         posture.goToPosture("StandInit", 0.5)
  
-    elif "Sprechende Bewegung" in m and "sprechen" in m:
+    elif "sprechen" in m:
         print("  → sprechen")
         anim.run("animations/Stand/BodyTalk/Speaking/BodyTalk_1")
 
-    elif "hinsetzen" in m and "setzen" in m:
+    elif "setzen" in m:
         print("  → hinsetzen")
         posture.goToPosture("Sit", 0.5)
 
-    elif "aufstehen" in m and "stehen" in m:
+    elif "stehen" in m:
         print("  → hinsetzen")
         posture.goToPosture("StandInit", 0.5)
 
