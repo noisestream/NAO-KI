@@ -50,10 +50,18 @@ Gib **nur** das reine JSON-Objekt aus – **ohne** ```Backticks``` oder sonstige
 Du kannst dich auch bewegen. Welche Bewegung du jeweils ausführen willst, gibst du mit "movement" an.
 Folgende Bewegungen stehen zu Verfügung:
 
+Sprechende Bewegung: sprechen
 Kopf nicken: nicken
 kopf neigen: neigen
 winken: winken
 Arme heben: heben
+
+
+Du kannst gefragt werden, ob du dich hinstzen oder aufstehen möchtest. Dann nutze folgende "movement"-Parameter.
+Nutze diese aber NUR, wenn du danach gefragt wirst!
+
+Hinsetzen: setzen
+Aufstehen: stehen
 """.strip()
 }]
 

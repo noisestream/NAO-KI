@@ -16,6 +16,7 @@ NAO_PORT  = 9559
 tts     = ALProxy("ALTextToSpeech", NAO_IP, NAO_PORT)
 motion  = ALProxy("ALMotion",         NAO_IP, NAO_PORT)
 posture = ALProxy("ALRobotPosture",   NAO_IP, NAO_PORT)
+anim = ALProxy("ALAnimationPlayer", NAO_IP, NAO_PORT)
 
 # Initial-Setup
 posture.goToPosture("StandInit", 0.5)
@@ -53,6 +54,18 @@ def perform_movement(move):
         angles = [0.2, 0.3, -0.2, -0.3]
         times  = [0.5, 0.5, 0.5, 0.5]
         motion.angleInterpolation(names, angles, times, True)
+        posture.goToPosture("StandInit", 0.5)
+ 
+    elif "Sprechende Bewegung" in m and "sprechen" in m:
+        print("  → sprechen")
+        anim.run("animations/Stand/BodyTalk/Speaking/BodyTalk_1")
+
+    elif "hinsetzen" in m and "setzen" in m:
+        print("  → hinsetzen")
+        posture.goToPosture("Sit", 0.5)
+
+    elif "aufstehen" in m and "stehen" in m:
+        print("  → hinsetzen")
         posture.goToPosture("StandInit", 0.5)
 
     else:
